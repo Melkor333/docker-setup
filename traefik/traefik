@@ -1,0 +1,11 @@
+#!/usr/bin/env oil
+
+var EMAIL 		= 'samuel@ton-kunst.ch'
+var USERNAME		= 'sam'
+var DOMAIN		= 'klara.yosemitesam.ch'
+var HASHED_PASSWORD	= $(cat ../passwd)
+export EMAIL
+export USERNAME
+export DOMAIN
+export HASHED_PASSWORD
+docker stack deploy -c traefik.yml traefik

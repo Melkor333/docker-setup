@@ -1,0 +1,38 @@
+version: '3.2'
+
+services:
+  registry:
+    image: registry:latest
+    #    volumes:
+    #      - /var/run/docker.sock:/var/run/docker.sock
+    #      - /var/lib/docker/volumes:/var/lib/docker/volumes
+    networks:
+      - traefik-public
+    ports:
+      - 5000:5000
+    volumes:
+      - data:/var/lib/registry
+      - auth:/auth
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels:
+        - traefik.docker.network=traefik-public
+        - traefik.enable=true
+        - traefik.http.services.registry-registry.loadbalancer.server.port=5000
+        - traefik.http.routers.registry.rule=Host(`registry.yosemitesam.ch`)
+        - traefik.http.routers.registry.entrypoints=https
+        - traefik.http.routers.registry.tls.certresolver=le
+        - traefik.http.routers.registry.tls=true
+    environment:
+      REGISTRY_AUTH: htpasswd
+      REGISTRY_AUTH_HTPASSWD_PATH: /auth/htpasswd
+      REGISTRY_AUTH_HTPASSWD_REALM: Yosemitesam Realm
+
+networks:
+  traefik-public:
+    external: true
+
+volumes:
+  data:
+  auth:

@@ -1,0 +1,13 @@
+* Adding users
+
+you might need the apache2-utils installed to use `htpasswd`.
+
+#+begin_src sh
+cd /var/lib/docker/volumes/registry_auth/_data/
+htpasswd -B htpasswd newUser
+
+# To create use
+htpasswd -cB htpasswd firstUser
+#end_src
+
+* TODO Cleanup existing images

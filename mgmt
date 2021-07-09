@@ -1,0 +1,36 @@
+#!/usr/bin/env oil
+
+# Check if a path exists and *exit* otherwise
+proc testPath (stack) {
+  if ! test -d "$stack" {
+    echo "sorry, $stack is not a directory"
+    exit 1
+  }
+}
+
+# Deploy / override an existing stack
+proc deploy (stack) {
+  cd $stack
+  if test -f "./$stack" {
+    ./$stack
+  } else {
+    docker stack deploy -c $stack.yml $stack
+  }
+}
+
+# Restart a stack. might be necessary some times...
+proc redeploy (stack) {
+  docker stack rm $stack
+  deploy $stack
+}
+
+if ($1 == "redeploy") {
+  testPath $2
+  redeploy $2
+} elif ($1 == "deploy") {
+  testPath $2
+  deploy $2
+} else {
+  echo "$1 coulnd't be understood."
+  exit 1
+}

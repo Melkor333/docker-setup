@@ -1,0 +1,61 @@
+* Basic Idea
+
+a traefik container distributes incoming requests on a URL basis to docker containers. Labels are being used to define how a container is accessed (URL & Port) aswell as middleware if necessary (e.g. basic auth).
+
+There are also some [[https://www.oilshell.org/][Oil shell]] scripts which help with an easy and smooth deployment.
+
+* Setup
+
+For these services to work, a `traefik-public` network needs to be created first.
+
+#+begin_src sh
+docker network create --driver=overlay traefik-public --attachable
+#+end_src
+
+* The docker-compose file
+
+Per service/stack, a docker compose file is being used. Following is an example of deployment labels:
+
+#+begin_src yaml
+#< snip >
+# It's important that the labels are under "deploy"
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels:
+        - traefik.docker.network=traefik-public
+        - traefik.enable=true
+	# This is necessary for swarmmode
+        - traefik.http.services.registry-registry.loadbalancer.server.port=5000
+	# The URL being used
+        - traefik.http.routers.registry.rule=Host(`registry.yosemitesam.ch`)
+	# HTTPS. All http is already redirected with a wildcard!
+        - traefik.http.routers.registry.entrypoints=https
+        # Use let's encrypt
+        - traefik.http.routers.registry.tls.certresolver=le
+        - traefik.http.routers.registry.tls=true
+#+end_src
+
+* Basic Deployments
+
+There are a few ways to deploy the stacks in the different directories.
+
+** Completely Manual
+
+When there is an existing `yml` file, it can easily be deployed with the following oil commands.
+#+begin_src sh
+setvar name = 'myService'
+docker stack deploy -c $name/$name.yml $name
+#+end_src
+
+** With the `mgmt` script
+This script either runs a script named `$stack/$stack` or runs "docker stack deploy" as a fallback if no script exists. The script can include additional things like (re-)creating a network or setting env variables/secrets.
+#+begin_src sh
+# Deploy/update a stack
+./mgmt deploy myStack
+
+# Delete the stack and deploy again (some times necessary, especially with traefik)
+./mgmt redeploy myStack
+#+end_src
+
+** TODO Within Portainer
