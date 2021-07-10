@@ -31,7 +31,6 @@ services:
         - traefik.enable=true
           #        - traefik.constraint-label=traefik-public
         - traefik.http.services.portainer-portainer.loadbalancer.server.port=9000
-        - traefik.http.routers.traefik-public-https.middlewares=admin-auth
         - traefik.http.routers.portainer.rule=Host(`portainer.yosemitesam.ch`)
         - traefik.http.routers.portainer.entrypoints=https
         - traefik.http.routers.portainer.tls.certresolver=le
