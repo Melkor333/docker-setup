@@ -25,11 +25,11 @@ Per service/stack, a docker compose file is being used. Following is an example 
       labels:
         - traefik.docker.network=traefik-public
         - traefik.enable=true
-	# This is necessary for swarmmode
-        - traefik.http.services.registry-registry.loadbalancer.server.port=5000
-	# The URL being used
+        # This is necessary for swarmmode
+        - traefik.http.services.registry.loadbalancer.server.port=5000
+        # The URL being used
         - traefik.http.routers.registry.rule=Host(`registry.yosemitesam.ch`)
-	# HTTPS. All http is already redirected with a wildcard!
+        # HTTPS. All http is already redirected with a wildcard!
         - traefik.http.routers.registry.entrypoints=https
         # Use let's encrypt
         - traefik.http.routers.registry.tls.certresolver=le
