@@ -2,12 +2,17 @@
 
 you might need the apache2-utils installed to use `htpasswd`.
 
+builtin basic auth in the registry_auth volume sadly doesn't work as this requires the registry to run with https (which isn't the case as traefik does all the ssl).
+
 #+begin_src sh
-cd /var/lib/docker/volumes/registry_auth/_data/
-htpasswd -B htpasswd newUser
+cd /var/lib/docker/volumes/traefik_auth/_data/
+htpasswd -B registry.passwd newUser
+# This might not be necessary but it seems to be the case
+docker container update traefik_traefik
 
 # To create use
-htpasswd -cB htpasswd firstUser
+htpasswd -cB registry.passwd firstUser
 #end_src
 
 * TODO Cleanup existing images
+

@@ -1,18 +1,15 @@
-version: '3.2'
+version: '3.8'
 
 services:
   registry:
-    image: registry:latest
-    #    volumes:
-    #      - /var/run/docker.sock:/var/run/docker.sock
-    #      - /var/lib/docker/volumes:/var/lib/docker/volumes
+    image: registry:2
     networks:
       - traefik-public
-    ports:
-      - 5000:5000
     volumes:
       - data:/var/lib/registry
       - auth:/auth
+    environment:
+      - REGISTRY_STORAGE_DELETE_ENABLED=true
     deploy:
       mode: replicated
       replicas: 1
@@ -24,11 +21,17 @@ services:
         - traefik.http.routers.registry.entrypoints=https
         - traefik.http.routers.registry.tls.certresolver=le
         - traefik.http.routers.registry.tls=true
-    environment:
-      REGISTRY_AUTH: htpasswd
-      REGISTRY_AUTH_HTPASSWD_PATH: /auth/htpasswd
-      REGISTRY_AUTH_HTPASSWD_REALM: Yosemitesam Realm
-
+          # Basic auth with custom registry users
+        - traefik.http.middlewares.registry-auth.basicauth.usersfile=/auth/registry.passwd
+        # I'm actually not sure if the following is necessary, but it's more or less what they recommend in the nginx/apache settings
+        #- traefik.http.middlewares.registry-auth.basicauth.removeheader=true
+        - traefik.http.middlewares.registry-headers.headers.contentTypeNosniff=true
+        - traefik.http.middlewares.registry-headers.headers.customrequestheaders.Docker-Distribution-Api-Version=registry/2.0
+        - traefik.http.middlewares.registry-headers.headers.customresponseheaders.Docker-Distribution-Api-Version=registry/2.0
+          #        - traefik.http.middlewares.registry.headers.customrequestheaders.X-Forwarded-Proto=https
+        - traefik.http.middlewares.registry.headers.hostsProxyHeaders=true
+        - traefik.http.routers.registry.middlewares=registry-auth,registry-headers
+    # A user interface for my registry :)
 networks:
   traefik-public:
     external: true
