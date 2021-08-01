@@ -39,7 +39,7 @@ services:
         # traefik-http set up only to use the middleware to redirect to https
         # Uses the environment variable DOMAIN
         # Redirects all subdomains of yosemitesam.ch. We have no http.
-        - traefik.http.routers.public-http.rule=HostRegexp(`traefik.yosemitesam.ch`, `{subdomain:[a-z]+}.yosemitesam.ch`)
+        - traefik.http.routers.public-http.rule=HostRegexp(`traefik.yosemitesam.ch`, `{subdomain:[a-z]+}.yosemitesam.ch`, `yosemitesam.ch`)
         - traefik.http.routers.public-http.entrypoints=http
         - traefik.http.routers.public-http.middlewares=https-redirect
         # traefik-https the actual router using HTTPS
